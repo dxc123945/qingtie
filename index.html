@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我们结婚啦！</title>
+    <style>
+        /* --- 全局样式 --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: "KaiTi", "楷体", "Microsoft YaHei", sans-serif;
+            background-color: #f8f4f0;
+            color: #333;
+            overflow-x: hidden;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        /* --- 页面通用结构 --- */
+        .page {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* 第一页 */
+        #cover-page {
+            height: 100vh !important;
+            min-height: 100vh !important;
+            position: relative !important;
+        }
+
+        /* 第二页可以滚动 */
+        #detail-page {
+            min-height: 100vh;
+            height: auto;
+        }
+
+        /* --- 1. 封面页 (图片) --- */
+        #cover-page {
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            background-color: #fce4ec; /* 备用背景色 */
+        }
+
+        #cover-page::before {
+            display: none; /* 移除遮罩层 */
+        }
+
+        #cover-page .cover-overlay {
+            z-index: 2;
+        }
+
+        .cover-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent; /* 移除背景，让图片直接显示 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .cover-overlay > div {
+            font-size: 1.15rem;
+            color: #d22b2b;
+            margin-bottom: 25px;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8), 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* --- 2. 详细内容页 (图片) --- */
+        #detail-page {
+            background-color: #fff5f5; /* 备用背景色 */
+        }
+
+        #detail-page::before {
+            display: none; /* 移除遮罩层 */
+        }
+
+        #detail-page .detail-overlay {
+            z-index: 2;
+        }
+
+        .detail-overlay {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            padding: 0 20px;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* --- 3. 导航页 --- */
+        #nav-page {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #fff5f5;
+            padding: 60px 15px 30px;
+        }
+
+        .nav-container {
+            width: 100%;
+            max-width: 100%;
+            background: white;
+            padding: 25px 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .nav-title {
+            font-size: 1.6rem;
+            color: #d22b2b;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 0;
+            font-size: 1rem;
+        }
+
+        /* --- 导航卡片 --- */
+        .nav-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .nav-card {
+            background: #fff9f9;
+            border: 2px solid #d22b2b;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            /* 移除手机端的点击高亮 */
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .nav-card:active {
+            background: #d22b2b;
+            transform: scale(0.98);
+        }
+
+        .nav-card:active h3,
+        .nav-card:active p {
+            color: white;
+        }
+
+        .nav-card h3 {
+            color: #d22b2b;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .nav-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* --- 功能区域 --- */
+        .section-container {
+            display: none;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 2px dashed #ddd;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-container.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #d22b2b;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* --- 表单样式 --- */
+        form {
+            text-align: left;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px; /* 防止iOS自动缩放 */
+            font-family: inherit;
+            /* 移除iOS默认样式 */
+            -webkit-appearance: none;
+            -webkit-border-radius: 8px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #d22b2b;
+            box-shadow: 0 0 0 3px rgba(210, 43, 43, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: #d22b2b;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: bold;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .submit-btn:active {
+            background: #b02222;
+            transform: scale(0.98);
+        }
+
+        /* --- 地图样式 --- */
+        .map-container {
+            width: 100%;
+            height: 280px;
+            background: #f0f0f0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .location-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #fff9f9;
+            border-radius: 10px;
+        }
+
+        .location-info p {
+            margin: 5px 0;
+        }
+
+        /* --- 按钮样式 --- */
+        .btn {
+            padding: 10px 24px;
+            background: rgba(210, 43, 43, 0.9);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 2px 8px rgba(210, 43, 43, 0.25);
+            font-weight: normal;
+            -webkit-tap-highlight-color: transparent;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn:active {
+            background: rgba(176, 34, 34, 0.9);
+            transform: scale(0.95);
+        }
+
+        /* --- 音乐控制 --- */
+        #music-btn {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 1000;
+            font-size: 1.6rem;
+            color: #d22b2b;
+            cursor: pointer;
+            animation: beat 1.5s infinite ease-in-out;
+            background: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @keyframes beat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- 返回按钮 --- */
+        .back-btn {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.85);
+            color: #d22b2b;
+            border: 1.5px solid rgba(210, 43, 43, 0.6);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 100;
+            font-size: 0.8rem;
+            font-weight: normal;
+            -webkit-tap-highlight-color: transparent;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            backdrop-filter: blur(5px);
+        }
+
+        .back-btn:active {
+            background: rgba(210, 43, 43, 0.9);
+            color: white;
+            transform: scale(0.95);
+        }
+
+        /* --- 花瓣效果 --- */
+        .petal {
+            position: fixed;
+            top: -50px;
+            pointer-events: none;
+            z-index: 9999;
+            font-size: 20px;
+        }
+
+        @keyframes petalDrop {
+            0% {
+                top: -50px;
+                opacity: 0;
+                transform: translateX(0) rotate(0deg);
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                top: 110vh;
+                opacity: 0;
+                transform: translateX(30px) rotate(360deg);
+            }
+        }
+
+        /* --- 花瓣开关按钮 --- */
+        .petal-toggle {
+            position: fixed;
+            top: 70px;
+            right: 15px;
+            z-index: 1000;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #d22b2b;
+            border: 1.5px solid #d22b2b;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .petal-toggle.active {
+            background: rgba(210, 43, 43, 0.9);
+            color: white;
+        }
+
+        /* --- 开门动画效果 --- */
+        .door-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            pointer-events: none;
+            display: none;
+        }
+
+        .door-overlay.active {
+            display: block;
+        }
+
+        .door-single {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-size: cover;
+            background-position: center;
+            pointer-events: none;
+            transform-origin: left;
+        }
+
+        .door-overlay.opening .door-single {
+            animation: openDoorSingle 1.2s ease-in-out forwards;
+        }
+
+        @keyframes openDoorSingle {
+            0% {
+                transform: perspective(1000px) rotateY(0deg);
+            }
+            100% {
+                transform: perspective(1000px) rotateY(-100deg);
+            }
+        }
+
+        /* 桌面端适配 (屏幕宽度 > 768px) --- */
+        @media (min-width: 769px) {
+            body {
+                font-size: 18px;
+            }
+
+            /* 页面居中显示，限制最大宽度 */
+            .page {
+                max-width: 480px;
+                margin: 0 auto;
+                min-height: 100vh;
+            }
+
+            /* 导航页特殊处理 */
+            #nav-page {
+                max-width: 100%;
+                padding: 80px 20px 40px;
+            }
+
+            .nav-container {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 35px 30px;
+            }
+
+            /* 导航卡片横向排列 */
+            .nav-cards {
+                flex-direction: row;
+                gap: 20px;
+            }
+
+            .nav-card {
+                flex: 1;
+                padding: 25px 20px;
+                transition: all 0.3s;
+            }
+
+            .nav-card:hover {
+                background: #d22b2b;
+                transform: translateY(-5px);
+                box-shadow: 0 8px 20px rgba(210, 43, 43, 0.3);
+            }
+
+            .nav-card:hover h3,
+            .nav-card:hover p {
+                color: white;
+            }
+
+            /* 按钮鼠标悬停效果 */
+            .btn:hover {
+                background: rgba(176, 34, 34, 0.95);
+                transform: scale(1.05);
+            }
+
+            .submit-btn:hover {
+                background: #b02222;
+                transform: scale(1.02);
+            }
+
+            /* 返回按钮悬停效果 */
+            .back-btn:hover {
+                background: rgba(210, 43, 43, 0.9);
+                color: white;
+            }
+
+            /* 音乐按钮悬停效果 */
+            #music-btn:hover {
+                transform: scale(1.1);
+            }
+
+            /* 花瓣开关悬停效果 */
+            .petal-toggle:hover {
+                background: rgba(210, 43, 43, 0.9);
+                color: white;
+            }
+
+            /* 地图容器更高 */
+            .map-container {
+                height: 350px;
+            }
+
+            /* 标题字体更大 */
+            .nav-title {
+                font-size: 2rem;
+            }
+
+            .nav-subtitle {
+                font-size: 1.1rem;
+            }
+
+            /* 调整遮罩层的最大宽度 */
+            .cover-overlay,
+            .detail-overlay {
+                max-width: 480px;
+                margin: 0 auto;
+            }
+
+            .cover-overlay > div {
+                font-size: 1.3rem;
+            }
+
+            /* 移除触摸相关的高亮效果 */
+            * {
+                -webkit-tap-highlight-color: auto;
+            }
+
+            /* 优化滚动条样式 */
+            ::-webkit-scrollbar {
+                width: 10px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: #d22b2b;
+                border-radius: 5px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #b02222;
+            }
+        }
+    </style>
+    <script>
+        // 阻止浏览器记住滚动位置，确保每次都从顶部开始
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+    </script>
+</head>
+<body>
+
+    <!-- 音乐控制按钮 -->
+    <div id="music-btn" onclick="toggleMusic()">🎵</div>
+
+    <!-- 花瓣开关按钮 -->
+    <button id="petal-toggle" class="petal-toggle active" onclick="togglePetals()">❤️ 喜字飘</button>
+
+    <!-- 开门动画遮罩层 -->
+    <div id="door-overlay" class="door-overlay">
+        <div class="door-single" id="door-single"></div>
+    </div>
+
+    <!-- 1. 封面页 -->
+    <div id="cover-page" class="page" onclick="scrollToPage('detail-page')" style="cursor: pointer;">
+        <!-- 在此处设置封面图片 -->
+        <div class="cover-overlay">
+            <div style="position: absolute; top: 20px; right: 20px; font-size: 0.7rem; color: rgba(255, 255, 255, 0.7); text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);">点击打开请帖</div>
+        </div>
+        <!-- 添加不可见空间，让页面可以滚动 -->
+        <div style="height: 10px; width: 100%;"></div>
+    </div>
+
+    <!-- 页面间距白色背景 -->
+    <div style="height: 50px; background-color: white;"></div>
+
+    <!-- 2. 详细内容页 -->
+    <div id="detail-page" class="page">
+        <!-- 使用img标签确保长图完整显示 -->
+        <img id="detail-image" src="pic/pic2.webp" alt="详细内容" style="width: 100%; display: block; min-height: 100vh;">
+        <div class="detail-overlay">
+            <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); margin-bottom: 20px; font-size: 0.8rem; color: rgba(255, 255, 255, 0.7); text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); z-index: 10;"></div>
+        </div>
+    </div>
+
+    <!-- 3. 导航页 -->
+    <div id="nav-page" class="page">
+        <button class="back-btn" onclick="scrollToPage('cover-page')">← 返回封面</button>
+
+        <div class="nav-container">
+            <!-- 标题信息 -->
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 class="nav-title" style="margin-bottom: 15px;">🎊 婚礼邀请函 🎊</h2>
+                <p style="color: #d22b2b; font-size: 1.1rem; margin-bottom: 8px;">💒 丁鑫成 & 景倩</p>
+                <p class="nav-subtitle" style="margin-bottom: 0;">2026年5月2日 草坪仪式 15:18 · 嘉定公馆</p>
+            </div>
+
+            <!-- 地图卡片 -->
+            <div style="background: #fff9f9; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                    <h3 style="font-size: 1.2rem; color: #d22b2b; margin: 0;">📍 婚礼地点</h3>
+                    <a href="https://surl.amap.com/1CvnGdc1jeme" target="_blank" style="padding: 8px 16px; background: #d22b2b; color: white; text-decoration: none; border-radius: 18px; font-size: 0.85rem; white-space: nowrap;">导航</a>
+                </div>
+
+                <p style="font-weight: bold; color: #333; margin-bottom: 8px;">🏨 嘉定公馆</p>
+                <p style="color: #666; font-size: 0.9rem; margin-bottom: 5px; line-height: 1.5;">上海市嘉定镇塔城路298-300号2层<br>(嘉定禧玥酒店里)</p>
+
+                <div class="map-container" style="margin-top: 15px;">
+                    <img id="nav-map-image" src="pic/map.webp" alt="地图" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 背景音乐 -->
+    <audio id="bg-music" loop>
+        <source src="pic/wedding-march.mp3" type="audio/mpeg">
+        您的浏览器不支持音频标签。
+    </audio>
+
+    <script>
+        // 全局变量，标记是否正在程序控制滚动
+        let isProgramScrolling = false;
+        // 全局变量，标记翻页状态
+        let hasTriggeredPage2 = false;
+        let hasEnteredSecondPage = false;
+
+        // 设置封面和详情页的背景图片
+        document.addEventListener('DOMContentLoaded', function() {
+            // 封面图片
+            const coverImageUrl = 'pic/pic1.webp';
+            const detailImageUrl = 'pic/pic2.webp';
+
+            // 优化图片加载函数
+            function loadBackgroundImage(elementId, imageUrl) {
+                const element = document.getElementById(elementId);
+                const img = new Image();
+
+                img.onload = function() {
+                    // 检查图片大小
+                    if (this.width > 2000 || this.height > 2000) {
+                        console.warn(`${imageUrl} 图片过大，建议压缩到1000x1000以内`);
+                    }
+                    element.style.backgroundImage = `url('${imageUrl}')`;
+                };
+
+                img.onerror = function() {
+                    console.error(`无法加载图片: ${imageUrl}`);
+                    // 保持备用背景色
+                    alert('图片加载失败，请检查图片路径是否正确');
+                };
+
+                // 添加时间戳防止缓存问题
+                img.src = imageUrl + '?t=' + Date.now();
+            }
+
+            // 加载图片
+            loadBackgroundImage('cover-page', coverImageUrl);
+            loadBackgroundImage('nav-page', 'pic/back_pic.webp');
+            // 第二页使用img标签，不需要背景图片
+
+
+            // 确保页面从顶部开始显示（多次确保）
+            window.scrollTo(0, 0);
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+
+            // 延迟再次确保滚动到顶部
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }, 100);
+
+            // 最后再次确保
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }, 500);
+
+            // 监听滚动，完全阻止回到第一页
+            let isScrollingProgrammatically = false;
+            let lastTouchY = 0;
+
+            // 监听滚轮事件（桌面端）
+            window.addEventListener('wheel', function(e) {
+                if (hasTriggeredPage2) return;
+
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                // 如果在第一页顶部且向下滚动
+                if (scrollTop < 10 && e.deltaY > 0) {
+                    hasTriggeredPage2 = true;
+                    e.preventDefault();
+                    // 播放开门动画并滚动到第二页
+                    playDoorAnimation();
+                    setTimeout(() => {
+                        document.getElementById('detail-page').scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                }
+            }, { passive: false });
+
+            // 监听触摸滑动（移动端）
+            window.addEventListener('touchstart', function(e) {
+                lastTouchY = e.touches[0].clientY;
+            }, { passive: true });
+
+            window.addEventListener('touchmove', function(e) {
+                if (hasTriggeredPage2) return;
+
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                const currentTouchY = e.touches[0].clientY;
+                const deltaY = lastTouchY - currentTouchY;
+
+                // 如果在第一页顶部且向下滑动
+                if (scrollTop < 10 && deltaY > 50) {
+                    hasTriggeredPage2 = true;
+                    // 播放开门动画并滚动到第二页
+                    playDoorAnimation();
+                    setTimeout(() => {
+                        document.getElementById('detail-page').scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                }
+            }, { passive: true });
+
+            window.addEventListener('scroll', function() {
+                // 如果是程序控制滚动（如点击返回按钮），不干预
+                if (isScrollingProgrammatically || isProgramScrolling) return;
+
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                const windowHeight = window.innerHeight;
+
+                // 标记已经进入第二页
+                if (scrollTop >= windowHeight * 0.5) {
+                    hasEnteredSecondPage = true;
+                }
+
+                // 检测第一页下滑，触发翻页到第二页
+                if (!hasTriggeredPage2 && scrollTop > 50 && scrollTop < windowHeight * 0.9) {
+                    hasTriggeredPage2 = true;
+                    isScrollingProgrammatically = true;
+                    // 先滚动回顶部
+                    window.scrollTo({ top: 0, behavior: 'instant' });
+                    // 播放开门动画并滚动到第二页
+                    playDoorAnimation();
+                    setTimeout(() => {
+                        document.getElementById('detail-page').scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                    setTimeout(() => {
+                        isScrollingProgrammatically = false;
+                    }, 1000);
+                    return;
+                }
+
+                // 如果已经进入第二页，并且试图回到第一页（scrollTop < windowHeight * 0.9）
+                if (hasEnteredSecondPage && scrollTop < windowHeight * 0.9) {
+                    isScrollingProgrammatically = true;
+                    window.scrollTo({
+                        top: windowHeight,
+                        behavior: 'instant'
+                    });
+                    setTimeout(() => {
+                        isScrollingProgrammatically = false;
+                    }, 50);
+                }
+            });
+        });
+
+        // 平滑滚动到指定页面
+        function scrollToPage(pageId) {
+            const element = document.getElementById(pageId);
+            if (!element) return;
+
+            // 标记为程序滚动，阻止scroll监听器干扰
+            isProgramScrolling = true;
+
+            // 如果是从第一页到第二页，播放开门动画
+            const scrollPosition = window.scrollY;
+            const windowHeight = window.innerHeight;
+            const currentPage = Math.floor(scrollPosition / windowHeight);
+
+            if (currentPage === 0 && pageId === 'detail-page') {
+                // 播放开门动画，同时立即滚动到第二页
+                playDoorAnimation();
+                element.scrollIntoView({ behavior: 'auto' });
+            } else {
+                // 如果是返回封面页，重置翻页标志
+                if (pageId === 'cover-page') {
+                    hasTriggeredPage2 = false;
+                    hasEnteredSecondPage = false;
+                }
+                // 直接滚动
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            // 滚动完成后，解除程序滚动标记（延时足够时间确保滚动完成）
+            setTimeout(function() {
+                isProgramScrolling = false;
+            }, 1500);
+        }
+
+        // 播放开门动画
+        function playDoorAnimation() {
+            const doorOverlay = document.getElementById('door-overlay');
+            const doorSingle = document.getElementById('door-single');
+            const coverPage = document.getElementById('cover-page');
+
+            // 获取封面图片并设置到门上
+            const coverImage = getComputedStyle(coverPage).backgroundImage;
+            doorSingle.style.backgroundImage = coverImage;
+
+            // 显示门
+            doorOverlay.classList.add('active');
+
+            // 播放开门动画
+            setTimeout(function() {
+                doorOverlay.classList.add('opening');
+            }, 100);
+
+            // 动画完成后隐藏门
+            setTimeout(function() {
+                doorOverlay.classList.remove('active', 'opening');
+            }, 1400);
+        }
+
+        // 音乐播放/暂停控制
+        const audio = document.getElementById('bg-music');
+        const musicBtn = document.getElementById('music-btn');
+        let hasInteracted = false;
+
+        function toggleMusic() {
+            if (audio.paused) {
+                audio.play().then(() => {
+                    musicBtn.innerHTML = '🔊';
+                }).catch(err => {
+                    console.log('音乐播放失败:', err);
+                });
+            } else {
+                audio.pause();
+                musicBtn.innerHTML = '🎵';
+            }
+        }
+
+        // 设置音量
+        audio.volume = 0.3;
+
+        // 尝试自动播放（手机端）
+        function attemptAutoplay() {
+            if (audio.paused) {
+                audio.play().then(() => {
+                    musicBtn.innerHTML = '🔊';
+                    console.log('音乐自动播放成功');
+                    hasInteracted = true; // 标记已成功播放
+                }).catch(err => {
+                    console.log('自动播放失败，将继续尝试:', err);
+                });
+            }
+        }
+
+        // 多个时间点尝试播放
+        attemptAutoplay(); // 立即尝试
+        setTimeout(attemptAutoplay, 100); // 100ms后
+        setTimeout(attemptAutoplay, 500); // 500ms后
+        setTimeout(attemptAutoplay, 1000); // 1秒后
+        setTimeout(attemptAutoplay, 2000); // 2秒后
+
+        // window.onload后再次尝试
+        window.addEventListener('load', function() {
+            setTimeout(attemptAutoplay, 300);
+        });
+
+        // 用户第一次交互时尝试播放音乐
+        function tryPlayOnInteract() {
+            if (!hasInteracted && audio.paused) {
+                hasInteracted = true;
+                audio.play().then(() => {
+                    musicBtn.innerHTML = '🔊';
+                    console.log('用户交互后播放成功');
+                }).catch(err => {
+                    console.log('交互后播放失败:', err);
+                });
+            }
+        }
+
+        document.addEventListener('click', tryPlayOnInteract, { once: true });
+        document.addEventListener('touchstart', tryPlayOnInteract, { once: true });
+        document.addEventListener('scroll', tryPlayOnInteract, { once: true });
+
+        // --- 花瓣效果 ---
+        let petalsEnabled = true;
+        let petalInterval = null;
+        let clickListenerAdded = false;
+        const petalColors = ['喜', '囍'];
+
+        function createPetal() {
+            if (!petalsEnabled) return;
+
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+            petal.innerHTML = petalColors[Math.floor(Math.random() * petalColors.length)];
+
+            // 随机位置和大小
+            const startX = Math.random() * window.innerWidth;
+            const size = Math.random() * 12 + 14;
+            const duration = Math.random() * 3 + 3;
+            const delay = Math.random() * 0.5;
+
+            petal.style.left = startX + 'px';
+            petal.style.fontSize = size + 'px';
+            petal.style.color = '#ff0000';
+            petal.style.fontWeight = 'bold';
+            petal.style.fontFamily = 'sans-serif';
+            petal.style.whiteSpace = 'nowrap';
+
+            // 检测是否从左边或右边飘落
+            const isLeft = startX < window.innerWidth / 2;
+            const targetX = isLeft ? -50 : window.innerWidth + 50; // 飘到边界外
+
+            const animation = petal.animate([
+                {
+                    top: '-30px',
+                    transform: 'translateX(0) rotate(0deg)',
+                    opacity: 0
+                },
+                {
+                    top: '20vh',
+                    opacity: 1,
+                    offset: 0.1
+                },
+                {
+                    top: '80vh',
+                    transform: `translateX(${isLeft ? -100 : 100}px) rotate(${Math.random() * 360}deg)`,
+                    opacity: 0.9,
+                    offset: 0.9
+                },
+                {
+                    top: '110vh',
+                    transform: `translateX(${isLeft ? -150 : 150}px) rotate(${Math.random() * 720}deg)`,
+                    opacity: 0
+                }
+            ], {
+                duration: duration * 1000,
+                delay: delay * 1000,
+                easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                fill: 'forwards'
+            });
+
+            document.body.appendChild(petal);
+
+            // 动画结束后移除元素
+            animation.onfinish = () => {
+                // 在边界处触发礼炮效果
+                const burstX = isLeft ? 0 : window.innerWidth;
+                const burstY = window.innerHeight * 0.9;
+                createFireworkBurst(burstX, burstY, isLeft);
+                petal.remove();
+            };
+        }
+
+        // 创建礼炮爆开效果
+        function createFireworkBurst(x, y, fromLeft) {
+            const particleCount = 15; // 粒子数量
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.innerHTML = '喜';
+                particle.style.position = 'fixed';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.fontSize = (Math.random() * 10 + 12) + 'px';
+                particle.style.color = '#ff0000';
+                particle.style.fontWeight = 'bold';
+                particle.style.fontFamily = 'sans-serif';
+                particle.style.pointerEvents = 'none';
+                particle.style.zIndex = '9999';
+                particle.style.whiteSpace = 'nowrap';
+
+                // 往中间喷射的角度
+                const baseAngle = fromLeft ? 0 : Math.PI; // 从左边向右(0度)，从右边向左(180度)
+                const spreadAngle = (Math.random() - 0.5) * Math.PI / 2; // ±45度扩散
+                const angle = baseAngle + spreadAngle;
+                const velocity = Math.random() * 200 + 150; // 喷射距离
+                const duration = Math.random() * 1 + 0.8; // 0.8-1.8秒
+
+                const endX = x + Math.cos(angle) * velocity;
+                const endY = y - Math.abs(Math.sin(angle) * velocity) - Math.random() * 100; // 向上喷射
+
+                const animation = particle.animate([
+                    {
+                        transform: 'translate(0, 0) scale(1)',
+                        opacity: 1
+                    },
+                    {
+                        transform: `translate(${endX - x}px, ${endY - y}px) scale(0.3)`,
+                        opacity: 0
+                    }
+                ], {
+                    duration: duration * 1000,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                    fill: 'forwards'
+                });
+
+                document.body.appendChild(particle);
+
+                animation.onfinish = () => {
+                    particle.remove();
+                };
+            }
+        }
+
+        function startPetals() {
+            if (petalInterval) return;
+            // 每300-500ms创建一个花瓣，不要太密集
+            petalInterval = setInterval(createPetal, 400);
+
+            // 只添加一次点击监听器
+            if (!clickListenerAdded) {
+                document.addEventListener('click', function(e) {
+                    createPetalAtPosition(e.clientX, e.clientY);
+                });
+                clickListenerAdded = true;
+            }
+        }
+
+        // 在指定位置生成喜字
+        function createPetalAtPosition(x, y) {
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+            petal.innerHTML = petalColors[Math.floor(Math.random() * petalColors.length)];
+
+            const size = Math.random() * 15 + 20; // 20-35px，点击生成的稍微大一点
+            const duration = Math.random() * 2 + 2; // 2-4秒
+
+            petal.style.left = x + 'px';
+            petal.style.top = y + 'px';
+            petal.style.fontSize = size + 'px';
+            petal.style.color = '#ff0000';
+            petal.style.fontWeight = 'bold';
+            petal.style.fontFamily = 'sans-serif';
+            petal.style.whiteSpace = 'nowrap';
+
+            // 从点击位置向四周扩散并下落
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 100 + 50;
+            const endX = x + Math.cos(angle) * distance;
+            const endY = y + 300 + Math.random() * 200; // 向下300-500px
+
+            const animation = petal.animate([
+                {
+                    transform: 'translate(0, 0) rotate(0deg) scale(0)',
+                    opacity: 0
+                },
+                {
+                    transform: 'translate(0, 0) rotate(0deg) scale(1)',
+                    opacity: 1,
+                    offset: 0.1
+                },
+                {
+                    transform: `translate(${Math.cos(angle) * distance * 0.5}px, 150px) rotate(${Math.random() * 360}deg) scale(1)`,
+                    offset: 0.5
+                },
+                {
+                    transform: `translate(${Math.cos(angle) * distance}px, ${endY - y}px) rotate(${Math.random() * 720}deg) scale(0.5)`,
+                    opacity: 0
+                }
+            ], {
+                duration: duration * 1000,
+                easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                fill: 'forwards'
+            });
+
+            document.body.appendChild(petal);
+
+            animation.onfinish = () => {
+                petal.remove();
+            };
+        }
+
+        function stopPetals() {
+            if (petalInterval) {
+                clearInterval(petalInterval);
+                petalInterval = null;
+            }
+            // 移除所有现有花瓣
+            document.querySelectorAll('.petal').forEach(p => p.remove());
+        }
+
+        function togglePetals() {
+            petalsEnabled = !petalsEnabled;
+            const btn = document.getElementById('petal-toggle');
+
+            if (petalsEnabled) {
+                startPetals();
+                btn.textContent = '❤️ 喜字飘';
+                btn.classList.add('active');
+            } else {
+                stopPetals();
+                btn.textContent = '❤️ 喜字关';
+                btn.classList.remove('active');
+            }
+        }
+
+        // 页面加载时自动启动喜字飘动效果
+        startPetals();
+    </script>
+
+</body>
+</html>
